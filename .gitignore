@@ -1,0 +1,30 @@
+# Vendored deps (regenerate with `go mod vendor`)
+/vendor/
+
+# Binaries / build output
+/beam
+/beam-cli
+*.exe
+*.test
+*.out
+/dist/
+/bin/
+
+# Temp files/dirs
+*.tmp
+*.temp
+tmp/
+temp/
+*.log
+*.bak
+*.swp
+*.swo
+*~
+
+# macOS
+.DS_Store
+._*
+
+# Editor/IDE
+.idea/
+.vscode/
