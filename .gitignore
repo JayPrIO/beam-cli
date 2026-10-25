@@ -1,3 +1,7 @@
+# Project-local docs, not tracked
+/CLAUDE.md
+/PROMPT.md
+
 # Vendored deps (regenerate with `go mod vendor`)
 /vendor/
 
