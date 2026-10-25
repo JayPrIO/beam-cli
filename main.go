@@ -3,7 +3,7 @@ package main
 import (
 	"os"
 
-	"github.com/kaihiwatari8/beam-cli/cmd"
+	"github.com/jayprio/beam-cli/cmd"
 )
 
 func main() {

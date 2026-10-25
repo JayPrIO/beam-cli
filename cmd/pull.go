@@ -8,10 +8,10 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/kaihiwatari8/beam-cli/internal/config"
-	"github.com/kaihiwatari8/beam-cli/internal/ignore"
-	"github.com/kaihiwatari8/beam-cli/internal/registry"
-	"github.com/kaihiwatari8/beam-cli/internal/sync"
+	"github.com/jayprio/beam-cli/internal/config"
+	"github.com/jayprio/beam-cli/internal/ignore"
+	"github.com/jayprio/beam-cli/internal/registry"
+	"github.com/jayprio/beam-cli/internal/sync"
 )
 
 func newPullCmd() *cobra.Command {

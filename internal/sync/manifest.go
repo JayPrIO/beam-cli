@@ -12,7 +12,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/kaihiwatari8/beam-cli/internal/fsutil"
+	"github.com/jayprio/beam-cli/internal/fsutil"
 )
 
 // FileState is one path's recorded state: enough to detect whether it

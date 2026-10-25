@@ -1,4 +1,4 @@
-module github.com/kaihiwatari8/beam-cli
+module github.com/jayprio/beam-cli
 
 go 1.27.3
 

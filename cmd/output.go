@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"sort"
 
-	"github.com/kaihiwatari8/beam-cli/internal/errs"
-	"github.com/kaihiwatari8/beam-cli/internal/sync"
+	"github.com/jayprio/beam-cli/internal/errs"
+	"github.com/jayprio/beam-cli/internal/sync"
 )
 
 // printPlan prints a Plan's summary counts, and (with --verbose or

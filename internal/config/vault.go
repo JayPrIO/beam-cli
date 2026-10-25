@@ -9,7 +9,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/kaihiwatari8/beam-cli/internal/registry"
+	"github.com/jayprio/beam-cli/internal/registry"
 )
 
 // vaultsDirName is the subfolder beam creates inside iCloud Drive to

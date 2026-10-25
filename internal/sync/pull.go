@@ -5,8 +5,8 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/kaihiwatari8/beam-cli/internal/errs"
-	"github.com/kaihiwatari8/beam-cli/internal/fsutil"
+	"github.com/jayprio/beam-cli/internal/errs"
+	"github.com/jayprio/beam-cli/internal/fsutil"
 )
 
 // ConflictMode controls what Pull does with a path that changed on
