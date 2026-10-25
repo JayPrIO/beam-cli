@@ -1,0 +1,18 @@
+# beam default ignore list
+.git/
+.beam/
+node_modules/
+.venv/
+venv/
+vendor/
+build/
+dist/
+target/
+.next/
+__pycache__/
+*.pyc
+.DS_Store
+*.log
+.idea/
+.vscode/
+*.swp
