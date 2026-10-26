@@ -1,0 +1,373 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>beam — sync active code between Macs via iCloud</title>
+<meta name="description" content="beam syncs active repository files between Macs via iCloud Drive, skipping node_modules/vendor/build via .beamignore.">
+<style>
+  :root {
+    --bg: #ffffff;
+    --bg-alt: #f6f8fa;
+    --text: #1b1f24;
+    --text-dim: #57606a;
+    --border: #d8dee4;
+    --accent: #1f6feb;
+    --code-bg: #f6f8fa;
+    --code-text: #1b1f24;
+    --badge-bg: #eef2f6;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0d1117;
+      --bg-alt: #161b22;
+      --text: #e6edf3;
+      --text-dim: #9198a1;
+      --border: #30363d;
+      --accent: #58a6ff;
+      --code-bg: #161b22;
+      --code-text: #e6edf3;
+      --badge-bg: #1c2128;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    line-height: 1.6;
+  }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  code, pre {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    background: var(--code-bg);
+    color: var(--code-text);
+    border-radius: 6px;
+  }
+  code { padding: 0.15em 0.4em; font-size: 0.92em; }
+  pre {
+    padding: 14px 16px;
+    overflow-x: auto;
+    border: 1px solid var(--border);
+    line-height: 1.5;
+  }
+  pre code { padding: 0; background: none; }
+
+  header {
+    border-bottom: 1px solid var(--border);
+    padding: 48px 20px 36px;
+    text-align: center;
+  }
+  header h1 {
+    font-size: 2.4rem;
+    margin: 0 0 8px;
+    letter-spacing: -0.02em;
+  }
+  header p.tagline {
+    font-size: 1.15rem;
+    color: var(--text-dim);
+    margin: 0 0 20px;
+    max-width: 640px;
+    margin-inline: auto;
+  }
+  .badges { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin-bottom: 20px; }
+  .badges img { height: 20px; }
+  .cta { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+  .btn {
+    display: inline-block;
+    padding: 9px 18px;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    border: 1px solid var(--border);
+  }
+  .btn.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .btn.primary:hover { text-decoration: none; opacity: 0.9; }
+  .btn:not(.primary) { color: var(--text); }
+  .btn:not(.primary):hover { text-decoration: none; background: var(--bg-alt); }
+
+  nav.toc {
+    max-width: 880px;
+    margin: 28px auto 0;
+    padding: 0 20px;
+    display: flex;
+    gap: 18px;
+    flex-wrap: wrap;
+    justify-content: center;
+    font-size: 0.92rem;
+  }
+
+  main { max-width: 880px; margin: 0 auto; padding: 48px 20px 80px; }
+  section { margin-bottom: 56px; }
+  section h2 {
+    font-size: 1.5rem;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 10px;
+    margin-bottom: 18px;
+    scroll-margin-top: 20px;
+  }
+  section h3 { font-size: 1.15rem; margin-top: 28px; scroll-margin-top: 20px; }
+  p { margin: 0 0 16px; }
+  ul, ol { margin: 0 0 16px; padding-left: 1.4em; }
+  li { margin-bottom: 6px; }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 16px;
+    font-size: 0.92rem;
+  }
+  th, td {
+    text-align: left;
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+  th { color: var(--text-dim); font-weight: 600; }
+
+  .card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+    margin-bottom: 8px;
+  }
+  .card {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px 18px;
+    background: var(--bg-alt);
+  }
+  .card h4 { margin: 0 0 6px; font-size: 1rem; }
+  .card p { margin: 0; color: var(--text-dim); font-size: 0.92rem; }
+
+  .pill {
+    display: inline-block;
+    background: var(--badge-bg);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 2px 10px;
+    font-size: 0.78rem;
+    color: var(--text-dim);
+    margin-right: 6px;
+  }
+
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 28px 20px;
+    text-align: center;
+    color: var(--text-dim);
+    font-size: 0.88rem;
+  }
+
+  @media (max-width: 600px) {
+    header { padding: 36px 16px 28px; }
+    header h1 { font-size: 1.9rem; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>beam</h1>
+  <p class="tagline">Sync active repository code between Macs via iCloud Drive — no node_modules, vendor, or build artifacts, filtered out by a <code>.beamignore</code> file.</p>
+  <div class="badges">
+    <img src="https://github.com/jayprio/beam-cli/actions/workflows/release.yml/badge.svg" alt="release build status">
+    <img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="MIT license">
+    <img src="https://img.shields.io/badge/platform-macOS-lightgrey.svg" alt="macOS only">
+  </div>
+  <div class="cta">
+    <a class="btn primary" href="https://github.com/jayprio/beam-cli">View on GitHub</a>
+    <a class="btn" href="#install">Install</a>
+    <a class="btn" href="#docs">Docs</a>
+  </div>
+  <nav class="toc">
+    <a href="#motivation">Motivation</a>
+    <a href="#install">Install</a>
+    <a href="#quick-start">Quick start</a>
+    <a href="#docs">Commands</a>
+    <a href="#how-it-works">How it works</a>
+    <a href="#open-source">Open source</a>
+  </nav>
+</header>
+
+<main>
+
+<section id="intro">
+  <h2>What beam is</h2>
+  <p>
+    <strong>beam</strong> is a small Go CLI that keeps a repository's active source
+    files in sync between two Macs — a Mac Studio and a MacBook, say — using
+    <strong>iCloud Drive as the transport</strong>. There's no server, no
+    account, no network protocol beam invents: it writes into a folder under
+    <code>~/Library/Mobile Documents/com~apple~CloudDocs/beam-vaults/</code>
+    and lets iCloud carry it to your other machine, filtering out the heavy
+    directories you never want synced (<code>node_modules/</code>,
+    <code>vendor/</code>, <code>build/</code>, <code>.venv/</code>, …) via a
+    <code>.beamignore</code> file.
+  </p>
+</section>
+
+<section id="motivation">
+  <h2>Motivation</h2>
+  <p>
+    Switching machines mid-project is a common but annoying moment: a git
+    commit-push-pull round trip for work you don't want committed yet, a full
+    re-clone, or a slow drag-and-drop copy of a folder that includes
+    <code>node_modules/</code> and chokes iCloud (or your patience) in the
+    process.
+  </p>
+  <p>
+    iCloud Drive is already there, already paid for, and already running on
+    every Mac you own. beam's premise is that it's a perfectly good sync
+    transport for source code — the piece actually missing is <em>which
+    files</em> to sync and <em>how to sync them safely</em> without iCloud
+    uploading a half-written file if something's interrupted mid-copy.
+    That's what beam adds: an ignore file like <code>.gitignore</code>, and an
+    atomic stage-and-swap so a push is never half-finished from the other
+    machine's point of view.
+  </p>
+  <div class="card-grid">
+    <div class="card">
+      <h4>No server to run</h4>
+      <p>iCloud Drive is the whole transport. Nothing to host, nothing to pay for beyond iCloud itself.</p>
+    </div>
+    <div class="card">
+      <h4>Atomic by design</h4>
+      <p>Push stages into a temp folder, then swaps it into place with one rename. An interrupted push can't half-write the vault.</p>
+    </div>
+    <div class="card">
+      <h4>Ignore rules that matter</h4>
+      <p>Gitignore syntax, directories pruned before they're even walked — node_modules never gets touched.</p>
+    </div>
+  </div>
+</section>
+
+<section id="install">
+  <h2>Install</h2>
+  <pre><code>brew tap jayprio/beam
+brew install beam</code></pre>
+  <p>Installs a prebuilt binary — no Go toolchain required. See <a href="https://github.com/jayprio/homebrew-beam">jayprio/homebrew-beam</a>.</p>
+</section>
+
+<section id="quick-start">
+  <h2>Quick start</h2>
+  <h3>First machine</h3>
+  <pre><code>cd /path/to/project
+beam init
+beam push</code></pre>
+  <p><code>init</code> prints the project's id (e.g. <code>a6213d80</code>) — you'll need it on the second machine.</p>
+
+  <h3>Second machine</h3>
+  <pre><code>mkdir -p /path/to/project && cd /path/to/project
+beam init --join a6213d80   # or just `beam init --join` for an arrow-key picker
+beam pull</code></pre>
+  <p>From then on, <code>beam push</code> / <code>beam pull</code> on either machine.</p>
+</section>
+
+<section id="docs">
+  <h2>Commands</h2>
+
+  <h3><code>beam init</code></h3>
+  <p>Scans the current directory, writes a default <code>.beamignore</code> (unless one already exists), creates <code>.beam/</code> with a project id, and provisions a matching vault folder in iCloud Drive at <code>beam-vaults/&lt;name&gt;-&lt;id&gt;/</code>. Re-running <code>init</code> is a no-op unless <code>--force</code> is given.</p>
+  <table>
+    <tr><th>flag</th><th>effect</th></tr>
+    <tr><td><code>--join &lt;id&gt;</code></td><td>attach to an existing vault instead of creating a new one</td></tr>
+    <tr><td><code>--join</code> (no value)</td><td>pick a project from an arrow-key list of everything registered in iCloud</td></tr>
+    <tr><td><code>--name &lt;name&gt;</code></td><td>override the project name (defaults to the directory's basename)</td></tr>
+    <tr><td><code>--force</code></td><td>re-provision even if this directory is already a beam project</td></tr>
+    <tr><td><code>--force-ignore</code></td><td>overwrite an existing <code>.beamignore</code> with beam's defaults</td></tr>
+  </table>
+
+  <h3><code>beam push</code></h3>
+  <p>Copies every file not matched by <code>.beamignore</code> into the vault, using an atomic stage-and-swap: files are copied into a fresh staging directory first, then swapped into place with a single directory rename — so if <code>push</code> is interrupted, the vault is never left half written.</p>
+  <table>
+    <tr><th>flag</th><th>effect</th></tr>
+    <tr><td><code>--dry-run</code></td><td>show what push would do, write nothing</td></tr>
+    <tr><td><code>--force</code></td><td>clear a stale push lock before starting (doesn't override an actively-running push)</td></tr>
+    <tr><td><code>--verbose</code></td><td>print every add/update action, not just the summary</td></tr>
+  </table>
+
+  <h3><code>beam pull</code></h3>
+  <p>Reads the vault and merges new/updated files into the local repo. Pull never deletes local files, and always respects <code>.beamignore</code>. A file changed on <strong>both</strong> sides since the last sync is a conflict: by default it's left alone (and reported), so nothing gets overwritten silently.</p>
+  <table>
+    <tr><th>flag</th><th>effect</th></tr>
+    <tr><td><code>--dry-run</code></td><td>show what pull would do, write nothing</td></tr>
+    <tr><td><code>--force</code></td><td>overwrite local files on conflict — vault wins</td></tr>
+    <tr><td><code>--prefer-local</code></td><td>explicit alias for the default: skip conflicts, keep local</td></tr>
+    <tr><td><code>--verbose</code></td><td>print every add/update action, not just the summary</td></tr>
+  </table>
+
+  <h3><code>beam list</code></h3>
+  <p>Lists every project registered in iCloud — name, id, who created it, and when each machine last pushed/pulled it.</p>
+</section>
+
+<section id="how-it-works">
+  <h2>How it works</h2>
+  <ul>
+    <li><strong><code>.beamignore</code></strong> — standard gitignore syntax (wildcards, <code>**</code>, <code>!</code> negation). Defaults exclude <code>.git/</code>, <code>node_modules/</code>, <code>.venv/</code>, <code>vendor/</code>, <code>build/</code>, <code>dist/</code>, <code>__pycache__/</code>, and similar. <code>.beam/</code> and <code>.DS_Store</code>/AppleDouble files are always excluded, regardless of <code>.beamignore</code>'s contents.</li>
+    <li><strong><code>.beam/</code></strong> (local, per-machine, never synced) — <code>config.json</code> (project id, vault path), <code>manifest.json</code> (last-known-synced file state, used to diff on the next push/pull), <code>push.lock</code> (advisory lock held during a push).</li>
+    <li><strong>The registry</strong> — a small SQLite index at <code>beam-vaults/registry.db</code>, inside iCloud Drive, so it syncs to every machine automatically. It powers <code>beam list</code> and the <code>--join</code> picker, and tracks each project's last push/pull activity. Every write rebuilds the index into a temp copy and atomically renames it over the live file, so a concurrent iCloud sync can't corrupt it. If it's ever missing or unreadable, <code>--join &lt;id&gt;</code> falls back to scanning each vault's own <code>vault-meta.json</code>.</li>
+    <li><strong>Conflicts</strong> are never auto-merged — beam syncs files, it doesn't merge them. A conflicting file is left alone until you resolve it (edit, then push or pull again) or explicitly choose <code>--force</code>.</li>
+  </ul>
+
+  <h3>Exit codes</h3>
+  <table>
+    <tr><th>code</th><th>meaning</th></tr>
+    <tr><td><code>0</code></td><td>success</td></tr>
+    <tr><td><code>1</code></td><td>fatal error, operation aborted</td></tr>
+    <tr><td><code>2</code></td><td>completed, but with per-file errors</td></tr>
+    <tr><td><code>3</code></td><td>pull found conflicts, left unresolved</td></tr>
+  </table>
+
+  <h3>Known limitations</h3>
+  <ul>
+    <li>Two machines pushing at the exact same moment isn't coordinated — there's no distributed lock over iCloud, only a local advisory lock per machine. Last push wins.</li>
+    <li>No automatic merge on conflicting files; you resolve them by hand.</li>
+    <li>macOS only (relies on iCloud Drive's local path and dataless-file behavior).</li>
+  </ul>
+</section>
+
+<section id="open-source">
+  <h2>Open source</h2>
+  <p>
+    <span class="pill">MIT licensed</span>
+    <span class="pill">Go</span>
+    <span class="pill">macOS</span>
+  </p>
+  <p>
+    beam is MIT-licensed and open to contributions — bug reports, PRs,
+    and ideas are all welcome.
+  </p>
+  <div class="card-grid">
+    <div class="card">
+      <h4><a href="https://github.com/jayprio/beam-cli">Source</a></h4>
+      <p>jayprio/beam-cli — commands, sync engine, config, and the SQLite project registry.</p>
+    </div>
+    <div class="card">
+      <h4><a href="https://github.com/jayprio/beam-cli/blob/main/CONTRIBUTING.md">Contributing</a></h4>
+      <p>Build/test commands, project layout, and what to check before opening a PR.</p>
+    </div>
+    <div class="card">
+      <h4><a href="https://github.com/jayprio/beam-cli/issues">Issues</a></h4>
+      <p>Bug reports and feature requests. Include your macOS version — beam is macOS-only by design.</p>
+    </div>
+    <div class="card">
+      <h4><a href="https://github.com/jayprio/beam-cli/blob/main/LICENSE">License</a></h4>
+      <p>MIT. Use it, fork it, ship it.</p>
+    </div>
+  </div>
+  <pre><code># build and test from source
+go build ./...
+go test ./...</code></pre>
+</section>
+
+</main>
+
+<footer>
+  <a href="https://github.com/jayprio/beam-cli">github.com/jayprio/beam-cli</a> · MIT License
+</footer>
+
+</body>
+</html>
