@@ -1,5 +1,8 @@
 # beam
 
+[![release](https://github.com/jayprio/beam-cli/actions/workflows/release.yml/badge.svg)](https://github.com/jayprio/beam-cli/actions/workflows/release.yml)
+[![license: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+
 Sync active repository code between Macs (e.g. a Mac Studio and a
 MacBook) via iCloud Drive — no node_modules, vendor, build artifacts,
 or other heavy dependency folders, filtered out by a `.beamignore`
@@ -143,3 +146,13 @@ and when each machine last pushed/pulled it.
 go build ./...
 go test ./...
 ```
+
+## Contributing
+
+Bug reports and PRs are welcome — see [CONTRIBUTING.md](CONTRIBUTING.md)
+for how to build/test, the project layout, and what to check before
+opening a PR.
+
+## License
+
+[MIT](LICENSE)
