@@ -13,10 +13,11 @@ import (
 
 var verbose bool
 
-func newRootCmd() *cobra.Command {
+func newRootCmd(version string) *cobra.Command {
 	root := &cobra.Command{
 		Use:           "beam",
 		Short:         "Sync active repository code between Macs via iCloud Drive",
+		Version:       version,
 		SilenceUsage:  true,
 		SilenceErrors: true,
 	}
@@ -31,9 +32,9 @@ func newRootCmd() *cobra.Command {
 }
 
 // Execute runs the root command and returns the process exit code,
-// per the contract above.
-func Execute() int {
-	root := newRootCmd()
+// per the contract above. version is reported by `beam --version`.
+func Execute(version string) int {
+	root := newRootCmd(version)
 	root.SilenceErrors = true
 
 	if err := root.Execute(); err != nil {
